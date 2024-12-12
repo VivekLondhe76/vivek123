@@ -1,0 +1,77 @@
+Step 2: Create Tables with Auto Increment
+sql
+Copy code
+-- Create employee table
+CREATE TABLE employee (
+    eid INT AUTO_INCREMENT PRIMARY KEY,
+    ename VARCHAR(50),
+    salary DECIMAL(10, 2)
+);
+
+-- Create assignment table
+CREATE TABLE assignment (
+    projectid INT,
+    eid INT,
+    PRIMARY KEY (projectid, eid),
+    FOREIGN KEY (projectid) REFERENCES project(projectid),
+    FOREIGN KEY (eid) REFERENCES employee(eid)
+);
+
+-- Create project table
+CREATE TABLE project (
+    projectid INT AUTO_INCREMENT PRIMARY KEY,
+    project_name VARCHAR(100),
+    manager INT,
+    FOREIGN KEY (manager) REFERENCES manager(eid)
+);
+
+-- Create manager table
+CREATE TABLE manager (
+    eid INT AUTO_INCREMENT PRIMARY KEY,
+    ename VARCHAR(50)
+);
+Step 3: Queries
+i) Modify eid to Use AUTO_INCREMENT
+If not already done during table creation, alter the eid column:
+
+sql
+Copy code
+ALTER TABLE employee MODIFY eid INT AUTO_INCREMENT;
+ii) Display Employees Working in Both 'Bank Management' and 'Content Management'
+sql
+Copy code
+SELECT e.ename
+FROM employee e
+JOIN assignment a1 ON e.eid = a1.eid
+JOIN project p1 ON a1.projectid = p1.projectid
+JOIN assignment a2 ON e.eid = a2.eid
+JOIN project p2 ON a2.projectid = p2.projectid
+WHERE p1.project_name = 'Bank Management' 
+  AND p2.project_name = 'Content Management';
+iii) Display Average Salary of the Organization
+sql
+Copy code
+SELECT AVG(salary) AS average_salary 
+FROM employee;
+iv) Display Employees Who Do Not Work on 'Bank Management' Project
+sql
+Copy code
+SELECT e.ename
+FROM employee e
+WHERE e.eid NOT IN (
+    SELECT a.eid
+    FROM assignment a
+    JOIN project p ON a.projectid = p.projectid
+    WHERE p.project_name = 'Bank Management'
+);
+v) Delete Employee Whose ID is 5
+sql
+Copy code
+DELETE FROM employee
+WHERE eid = 5;
+vi) Display Employee Having the Highest Salary in the Organization
+sql
+Copy code
+SELECT ename, salary 
+FROM employee
+WHERE salary = (SELECT MAX(salary) FROM employee);

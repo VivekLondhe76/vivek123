@@ -1,0 +1,65 @@
+Step 1: Create Tables with Primary and Foreign Keys
+
+-- Create employee table
+CREATE TABLE employee (
+    eid INT PRIMARY KEY,
+    ename VARCHAR(50),
+    salary DECIMAL(10, 2)
+);
+
+-- Create assignment table
+CREATE TABLE assignment (
+    projectid INT,
+    eid INT,
+    PRIMARY KEY (projectid, eid),
+    FOREIGN KEY (projectid) REFERENCES project(projectid),
+    FOREIGN KEY (eid) REFERENCES employee(eid)
+);
+
+-- Create project table
+CREATE TABLE project (
+    projectid INT PRIMARY KEY,
+    project_name VARCHAR(100),
+    manager INT,
+    FOREIGN KEY (manager) REFERENCES manager(eid)
+);
+
+-- Create manager table
+CREATE TABLE manager (
+    eid INT PRIMARY KEY,
+    ename VARCHAR(50)
+);
+Step 2: Alter employee Table to Add address
+
+ALTER TABLE employee ADD address VARCHAR(100);
+Step 3: Queries
+i) Display employee names and projects they are working on
+
+SELECT e.ename, p.project_name 
+FROM employee e
+JOIN assignment a ON e.eid = a.eid
+JOIN project p ON a.projectid = p.projectid;
+ii) Display projectid, project_name, and their managers
+
+SELECT p.projectid, p.project_name, m.ename AS manager_name
+FROM project p
+JOIN manager m ON p.manager = m.eid;
+iii) Create a view of employees working on the 'Bank Management' project
+
+
+CREATE VIEW employees_on_bank_management AS
+SELECT e.eid, e.ename, e.salary
+FROM employee e
+JOIN assignment a ON e.eid = a.eid
+JOIN project p ON a.projectid = p.projectid
+WHERE p.project_name = 'Bank Management';
+
+iv) Print names of employees whose salary is greater than 40000
+
+SELECT ename 
+FROM employee
+WHERE salary > 40000;
+v) Update the salary of each employee with an increase of Rs. 2000
+
+UPDATE employee
+SET salary = salary + 2000;
